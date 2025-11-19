@@ -115,9 +115,17 @@ jobs:
           # Tap the repository (creates tap in Homebrew directory)
           brew tap ${{ github.repository }}
 
-          # Find the tap directory
-          TAP_DIR="$(brew --repository)/Library/Taps/${{ github.repository }}"
+          # Find the ACTUAL tap directory (Homebrew normalizes to lowercase)
+          TAP_DIR=$(brew --repository)/Library/Taps/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           echo "Tap directory: $TAP_DIR"
+
+          # Verify it exists
+          if [ ! -d "$TAP_DIR" ]; then
+            echo "ERROR: Tap directory not found at $TAP_DIR"
+            echo "Searching for tap directories:"
+            find $(brew --repository)/Library/Taps -type d -maxdepth 2
+            exit 1
+          fi
 
           # Process bottle JSON files
           for json in $GITHUB_WORKSPACE/bottles/*.bottle*.json; do
