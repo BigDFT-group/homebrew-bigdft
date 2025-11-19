@@ -4,13 +4,13 @@ This is a Homebrew tap for [BigDFT](http://bigdft.org), an electronic structure 
 
 Install BigDFT using pre-compiled bottles:
 ```bash
-brew tap william-dawson/bigdft
+brew tap BigDFT-group/bigdft
 brew install bigdft
 ```
 
 If you prefer to compile from source or if bottles aren't available for your system:
 ```bash
-brew tap william-dawson/bigdft
+brew tap BigDFT-group/bigdft
 brew install --build-from-source bigdft
 ```
 
@@ -27,5 +27,5 @@ brew uninstall bigdft
 
 To also remove the tap:
 ```bash
-brew untap william-dawson/bigdft
+brew untap BigDFT-group/bigdft
 ```
