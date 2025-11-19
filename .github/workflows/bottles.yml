@@ -81,7 +81,7 @@ jobs:
           
           # Upload all bottle tarballs
           cd bottles
-          for bottle in *.bottle.tar.gz; do
+          for bottle in *.bottle*.tar.gz; do
             echo "Uploading $bottle"
             gh release upload "$TAG" "$bottle" --repo ${{ github.repository }} --clobber
           done
@@ -105,7 +105,7 @@ jobs:
           cd bottles
           
           # Use brew bottle --merge to update the formula
-          for json in *.bottle.json; do
+          for json in *.bottle*.json; do
             echo "Processing $json"
             brew bottle --merge --write "$json" --root-url="https://github.com/${{ github.repository }}/releases/download/$TAG"
           done
