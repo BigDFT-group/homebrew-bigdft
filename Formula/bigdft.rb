@@ -5,9 +5,8 @@ class Bigdft < Formula
   sha256 "99f670d718ee5d3ea83832d76ff3dce38289fb3a9ee9a3284aa90492f019e44e"
 
   bottle do
-    rebuild 1
-    sha256 arm64_sequoia: "457a06c40169d835ab3203de9a5b2ee504d05961e55900fe1a6b14f846fd2c14"
-    root_url "https://github.com/william-dawson/homebrew-bigdft/releases/download/v1.9.6"
+    rebuild 2
+    sha256 arm64_sequoia: "747cf9c55c44109965c9c367ad53333c54c74ea5d9963157ba0d925d74760a8f"
   end
 
   depends_on "gcc"
