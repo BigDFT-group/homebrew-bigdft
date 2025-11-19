@@ -115,10 +115,6 @@ jobs:
             fi
           done
           
-          # Copy updated formula back to repo
-          cp "$(brew --repository)/Library/Taps/${{ github.repository }}/Formula/bigdft.rb" \
-             "$GITHUB_WORKSPACE/Formula/bigdft.rb"
-      
       - name: Commit and push updated formula
         run: |
           git config user.name "github-actions[bot]"
