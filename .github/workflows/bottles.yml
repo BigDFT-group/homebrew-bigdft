@@ -127,9 +127,17 @@ jobs:
             fi
           done
 
-          # The formula was updated and committed in the tap directory by brew bottle --merge
-          # Now we need to push from there
+          # Manually ensure root_url is in the formula
           cd "$TAP_DIR"
+          FORMULA_FILE="Formula/bigdft.rb"
+          ROOT_URL="https://github.com/${{ github.repository }}/releases/download/$TAG"
+
+          if ! grep -q "root_url" "$FORMULA_FILE"; then
+            echo "Adding root_url to formula"
+            sed -i "/bottle do/a\\    root_url \"$ROOT_URL\"" "$FORMULA_FILE"
+            git add "$FORMULA_FILE"
+            git commit --amend --no-edit
+          fi
 
           echo "Checking for changes in tap directory:"
           git log -1 --oneline
