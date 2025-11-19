@@ -68,6 +68,14 @@ jobs:
           echo "Downloaded bottles:"
           ls -la bottles/
 
+      - name: Rename bottles (fix double-dash)
+        run: |
+          cd bottles
+          for file in bigdft--*; do
+            [ -f "$file" ] && mv "$file" "${file/bigdft--/bigdft-}"
+          done
+          ls -la
+
       - name: Upload bottles to release
         env:
           GH_TOKEN: ${{ github.token }}
