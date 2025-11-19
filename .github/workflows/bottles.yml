@@ -3,7 +3,7 @@ name: Build and Upload Bottles
 on:
   release:
     types: [created]
-  workflow_dispatch:  # Allows manual trigger
+  workflow_dispatch: # Allows manual trigger
 
 jobs:
   build-bottles:
@@ -12,27 +12,27 @@ jobs:
         os:
           - macos-15
     runs-on: ${{ matrix.os }}
-    
+
     steps:
       - name: Set up Homebrew
         uses: Homebrew/actions/setup-homebrew@master
-      
+
       - name: Checkout tap repository
         uses: actions/checkout@v4
-      
+
       - name: Tap this repository
         run: |
           brew tap ${{ github.repository }}
-      
+
       - name: Install dependencies and build bottle
         run: |
           # Install build dependencies
           brew install --verbose --debug --only-dependencies ${{ github.repository }}/bigdft
-          
+
           # Build the bottle
           brew install --verbose --debug --build-bottle ${{ github.repository }}/bigdft
           brew bottle --json ${{ github.repository }}/bigdft
-      
+
       - name: Upload bottle as artifact
         uses: actions/upload-artifact@v4
         with:
@@ -40,13 +40,13 @@ jobs:
           path: |
             *.bottle.*
           retention-days: 1
-  
+
   upload-bottles:
     needs: build-bottles
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Needed to upload to releases
-    
+      contents: write # Needed to upload to releases
+
     steps:
       - name: Set up Homebrew
         uses: Homebrew/actions/setup-homebrew@master
@@ -55,19 +55,19 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
       - name: Download all bottle artifacts
         uses: actions/download-artifact@v4
         with:
           path: bottles
           pattern: bottles-*
           merge-multiple: true
-      
+
       - name: Display downloaded bottles
         run: |
           echo "Downloaded bottles:"
           ls -la bottles/
-      
+
       - name: Upload bottles to release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -79,17 +79,17 @@ jobs:
             # For manual triggers, use the latest tag
             TAG=$(git describe --tags --abbrev=0)
           fi
-          
+
           echo "Uploading bottles for tag: $TAG"
-          
+
           # Upload all bottle tarballs
           cd bottles
           for bottle in *.bottle*.tar.gz; do
             echo "Uploading $bottle"
             gh release upload "$TAG" "$bottle" --repo ${{ github.repository }} --clobber
           done
-      
-      - name: Update formula with bottle info
+
+      - name: Update formula with bottle info and push
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -100,31 +100,34 @@ jobs:
             TAG=$(git describe --tags --abbrev=0)
           fi
 
+          # Configure git
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # Tap the repository
+
+          # Tap the repository (creates tap in Homebrew directory)
           brew tap ${{ github.repository }}
-          
-          # Process bottle JSON files using absolute path
-          cd $GITHUB_WORKSPACE/bottles
-          for json in *.bottle*.json; do
+
+          # Find the tap directory
+          TAP_DIR="$(brew --repository)/Library/Taps/${{ github.repository }}"
+          echo "Tap directory: $TAP_DIR"
+
+          # Process bottle JSON files
+          for json in $GITHUB_WORKSPACE/bottles/*.bottle*.json; do
             if [ -f "$json" ]; then
               echo "Processing $json"
               brew bottle --merge --write "$json" --root-url="https://github.com/${{ github.repository }}/releases/download/$TAG"
             fi
           done
-          
-      - name: Commit and push updated formula
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          git add Formula/bigdft.rb
-          
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "Add bottles for ${GITHUB_REF#refs/tags/}"
-            git push
-          fi
+
+          # The formula was updated and committed in the tap directory by brew bottle --merge
+          # Now we need to push from there
+          cd "$TAP_DIR"
+
+          echo "Checking for changes in tap directory:"
+          git log -1 --oneline
+          git status
+
+          # Push the changes that brew bottle --merge committed
+          git push https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git HEAD:main
+
+          echo "Formula updated and pushed successfully"
