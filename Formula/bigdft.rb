@@ -11,6 +11,7 @@ class Bigdft < Formula
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "cmake" => :build
+  depends_on "python-setuptools" => :build
 
   patch :DATA
 
