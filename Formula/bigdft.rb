@@ -4,6 +4,11 @@ class Bigdft < Formula
   url "https://gitlab.com/l_sim/bigdft-suite/-/archive/1.9.6/bigdft-suite-1.9.6.tar.gz"
   sha256 "99f670d718ee5d3ea83832d76ff3dce38289fb3a9ee9a3284aa90492f019e44e"
 
+  bottle do
+    rebuild 1
+    sha256 arm64_sequoia: "457a06c40169d835ab3203de9a5b2ee504d05961e55900fe1a6b14f846fd2c14"
+  end
+
   depends_on "gcc"
   depends_on "open-mpi"
   depends_on "python@3"
