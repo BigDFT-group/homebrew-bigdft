@@ -99,6 +99,9 @@ jobs:
           else
             TAG=$(git describe --tags --abbrev=0)
           fi
+
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
           # Tap the repository
           brew tap ${{ github.repository }}
