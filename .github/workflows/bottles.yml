@@ -10,7 +10,6 @@ jobs:
     strategy:
       matrix:
         os:
-          - macos-14
           - macos-15
     runs-on: ${{ matrix.os }}
     
@@ -28,10 +27,10 @@ jobs:
       - name: Install dependencies and build bottle
         run: |
           # Install build dependencies
-          brew install --only-dependencies ${{ github.repository }}/bigdft
+          brew install --verbose --debug --only-dependencies ${{ github.repository }}/bigdft
           
           # Build the bottle
-          brew install --build-bottle ${{ github.repository }}/bigdft
+          brew install --verbose --debug --build-bottle ${{ github.repository }}/bigdft
           brew bottle --json ${{ github.repository }}/bigdft
       
       - name: Upload bottle as artifact
