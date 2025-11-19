@@ -88,7 +88,7 @@ jobs:
       
       - name: Set up Homebrew
         uses: Homebrew/actions/setup-homebrew@master
-      
+
       - name: Update formula with bottle info
         env:
           GH_TOKEN: ${{ github.token }}
@@ -100,19 +100,21 @@ jobs:
             TAG=$(git describe --tags --abbrev=0)
           fi
           
-          # Merge bottle JSON files
+          # Tap the repository
           brew tap ${{ github.repository }}
-          cd bottles
           
-          # Use brew bottle --merge to update the formula
+          # Process bottle JSON files using absolute path
+          cd $GITHUB_WORKSPACE/bottles
           for json in *.bottle*.json; do
-            echo "Processing $json"
-            brew bottle --merge --write "$json" --root-url="https://github.com/${{ github.repository }}/releases/download/$TAG"
+            if [ -f "$json" ]; then
+              echo "Processing $json"
+              brew bottle --merge --write "$json" --root-url="https://github.com/${{ github.repository }}/releases/download/$TAG"
+            fi
           done
           
           # Copy updated formula back to repo
-          cp $(brew --repository)/Library/Taps/${{ github.repository }}/Formula/bigdft.rb \
-             $GITHUB_WORKSPACE/Formula/bigdft.rb
+          cp "$(brew --repository)/Library/Taps/${{ github.repository }}/Formula/bigdft.rb" \
+             "$GITHUB_WORKSPACE/Formula/bigdft.rb"
       
       - name: Commit and push updated formula
         run: |
