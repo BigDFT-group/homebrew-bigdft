@@ -48,6 +48,9 @@ jobs:
       contents: write  # Needed to upload to releases
     
     steps:
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
       - name: Checkout tap repository
         uses: actions/checkout@v4
         with:
@@ -86,9 +89,6 @@ jobs:
             gh release upload "$TAG" "$bottle" --repo ${{ github.repository }} --clobber
           done
       
-      - name: Set up Homebrew
-        uses: Homebrew/actions/setup-homebrew@master
-
       - name: Update formula with bottle info
         env:
           GH_TOKEN: ${{ github.token }}
