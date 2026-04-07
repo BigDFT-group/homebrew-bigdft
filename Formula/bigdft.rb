@@ -69,6 +69,7 @@ class Bigdft < Formula
 
       bin.install "install/bin/bigdft"
       bin.install "install/bin/bigdft-tool"
+      bin.install "install/bin/memguess"
     end
   end
 
