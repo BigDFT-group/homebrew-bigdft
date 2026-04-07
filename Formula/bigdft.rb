@@ -68,6 +68,7 @@ class Bigdft < Formula
              "-f", "#{buildpath}/homebrew-static.rc", "-y"
 
       bin.install "install/bin/bigdft"
+      bin.install "install/bin/bigdft-tool"
     end
   end
 
